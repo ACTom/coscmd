@@ -13,7 +13,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "QCloud\\Cos\\": "src/qcloud/cos/"
+            "ACTom\\COSCmd\\": "src/"
         }
     },
     "repositories": [
@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "qcloud/cos": "master-dev",
+        "qcloud/cos": "dev-dev",
         "symfony/console": "3.2"
     }
 }
