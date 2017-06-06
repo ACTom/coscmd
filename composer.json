@@ -1,0 +1,30 @@
+{
+    "name": "actom/cos-cmd",
+    "description": "Tencent cloud cos command tool",
+    "keywords": [
+        "qcloud", "cos", "php", "command", "tool"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ACTom",
+            "email": "i@actom.me"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "QCloud\\Cos\\": "src/qcloud/cos/"
+        }
+    },
+    "repositories": [
+        {
+          "type": "git",
+          "url": "https://github.com/tencentyun/cos-php-sdk-v4.git"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "qcloud/cos": "master-dev",
+        "symfony/console": "3.2"
+    }
+}
