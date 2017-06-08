@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 require __DIR__ . '/vendor/autoload.php';
@@ -6,10 +5,12 @@ require __DIR__ . '/vendor/autoload.php';
 use Symfony\Component\Console\Application;
 use ACTom\COSCmd\Cos;
 
-$config = require __DIR__ . '/config.php';
+$configDirectory = Phar::running(false) ? dirname(Phar::running(false)) : __DIR__;
+$config = require $configDirectory . '/config.php';
 $handle = new Cos($config);
 
-$commands = ['test', 'ls', 'mv', 'rmdir', 'mkdir', 'rm', 'cp', 'push', 'pull'];
+
+$commands = ['ls', 'mv', 'rmdir', 'mkdir', 'rm', 'cp', 'push', 'pull'];
 
 $application = new Application();
 $application->setName('Tencent Cloud COS Command Tool');
