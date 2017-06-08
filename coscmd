@@ -4,12 +4,19 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use ACTom\COSCmd\Command\MoveCommand;
+use ACTom\COSCmd\Cos;
 
 $config = require __DIR__ . '/config.php';
+$handle = new Cos($config);
+
+$commands = ['test', 'ls', 'mv', 'rmdir', 'mkdir', 'rm', 'cp', 'push', 'pull'];
 
 $application = new Application();
 $application->setName('Tencent Cloud COS Command Tool');
 $application->setVersion('v0.0.1');
-$application->add(new MoveCommand());
+foreach ($commands as $command) {
+    $command = ucfirst($command);
+    $commandName = "\\ACTom\\COSCmd\\Command\\{$command}Command";
+    $application->add(new $commandName());
+}
 $application->run();

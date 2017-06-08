@@ -19,12 +19,13 @@
     "repositories": [
         {
           "type": "git",
-          "url": "https://github.com/tencentyun/cos-php-sdk-v4.git"
+          "url": "https://github.com/ACTom/cos-php-sdk-v4.git"
         }
     ],
     "require": {
-        "php": ">=5.6.0",
+        "php": ">=5.4.0",
         "qcloud/cos": "dev-dev",
-        "symfony/console": "3.2"
+        "symfony/console": "3.2",
+        "rkr/wildcards": "^1.0"
     }
 }

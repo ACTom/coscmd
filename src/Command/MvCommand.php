@@ -6,16 +6,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use QCloud\Cos\Api;
 
 
-class MoveCommand extends Command {
+class MvCommand extends Command {
 
     protected function configure() {
         $this
-            ->setName('move')
-            ->setAliases(['mv'])
-            ->setDescription('Move File in COS')
+            ->setName('mv')
+            ->setDescription('Move files')
             ->setHelp('This command allows you to move file from a path to another')
             ->addArgument('source', InputArgument::REQUIRED, 'Which file would you like to move?')
             ->addArgument('destnation', InputArgument::REQUIRED, 'Where would you like to move to?')
@@ -23,12 +21,17 @@ class MoveCommand extends Command {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        
+        $source = $input->getArgument('source');
+        $destnation = $input->getArgument('destnation');
+        $this->doAction($source, $destnation, $output);
     }
     
-    public function doAction($source, $destnation) {
-        global $config;
-        $api = new Api($config);
-        $api->moveFile($config['bucket'], $source, $destnation);
+    public function doAction($source, $destnation, OutputInterface $output) {
+        global $handle;
+        if (!$handle->moveFile($source, $destnation)) {
+            $errorNo = $handle->getLastErrorNo();
+            $errorMsg = $handle->getLastError();
+            $output->writeln("mv: rename {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}");
+        }
     }
 }
