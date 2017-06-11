@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Helper\Table;
+use ACTom\COSCmd\Utils;
 
 
 class LsCommand extends Command {
@@ -17,24 +19,28 @@ class LsCommand extends Command {
             ->setAliases(['dir'])
             ->setDescription('List directory contents')
             ->setHelp('Displays the infomation of files within the directory')
-            ->addArgument('directory', InputArgument::IS_ARRAY, 
-                'Which directory would you like to display?', ['/'])
+            ->addArgument('file', InputArgument::IS_ARRAY, 
+                'Which file would you like to display?', ['/'])
             ->addOption('long', 'l', InputOption::VALUE_NONE, 'use a long listing format')
+            ->addOption('color', null, InputOption::VALUE_OPTIONAL, "colorize the output; WHEN can be 'never', 'auto', or 'always' (the default); more info below", 'always')
+            ->addOption('classify', 'F', InputOption::VALUE_NONE, 'append indicator (one of */=>@|) to entries')
+            ->addOption('directory', 'd', InputOption::VALUE_NONE, 'list directories themselves, not their contents')
+            ->addOption('all', 'a', InputOption::VALUE_NONE, 'do not ignore entries starting with .')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $directory = $input->getArgument('directory');
-        $option = $input->getOptions();
-        $this->doAction($directory, $option, $output);
+        $files = $input->getArgument('file');
+        $options = $input->getOptions();
+        $this->doAction($files, $options, $output);
     }
     
-    public function doAction($directories, $option, OutputInterface $output) {
-        $list = $this->getFileList($directories, $option, $output);
-        $this->printDirectory($list, $option, $output);
+    public function doAction($files, $options, OutputInterface $output, $baseDirectory = '/') {
+        $list = $this->getFileList($files, $options, $output, $baseDirectory);
+        $this->printDirectory($list, $options, $output);
     }
     
-    private function getFileList($directories, $option, OutputInterface $output) {
+    private function getFileList($files, $options, OutputInterface $output, $baseDirectory = '/') {
         global $handle;
         $fileList = [
             'file' => [],
@@ -45,11 +51,12 @@ class LsCommand extends Command {
             'size' => 0
         ];
         $errorOutput = $output->getErrorOutput();
-        foreach ($directories as $directory) {
-            $fileInfo = $handle->getFileInfo($directory);
+        foreach ($files as $filePath) {
+            $fullPath = Utils::normalizerRemotePath($filePath, $baseDirectory);
+            $fileInfo = $handle->getFileInfo($fullPath);
             /* 文件不存在 */
             if ($fileInfo === false) {
-                $errorOutput->writeln("ls: cannot access '{$directory}': No such file or directory");
+                $errorOutput->writeln("ls: cannot access '{$filePath}': No such file or directory");
                 continue;
             }
             
@@ -60,24 +67,28 @@ class LsCommand extends Command {
                 continue;
             }
             /* 文件夹 */
-            $fileInfo['children'] = $handle->listDirectory($directory);
+            $fileInfo['children'] = $handle->listDirectory($fullPath, $options['all']);
             $fileInfo['childrenCount'] = count($fileInfo['children']) + 2;
             $maxData['children'] = max($maxData['children'], $fileInfo['childrenCount']);
-            /* 显示详细信息 */
-            if ($option['long']) {
-                foreach ($fileInfo['children'] as &$item) {
-                    /* 统计子目录个数以及获取目录修改时间 */
-                    if ($item['isDirectory']) {
-                        $directoryName = $fileInfo['name'] . '/' . $item['name'];
-                        $itemChildren = $handle->listDirectory($directoryName);
-                        $item['childrenCount'] = count($itemChildren) + 2;
-                        $maxData['children'] = max($maxData['children'], $item['childrenCount']);
-                    } else {
-                        $maxData['size'] = max($maxData['size'], $item['fileSize']);
+            if (!$options['directory']) {
+                /* 显示详细信息 */
+                if ($options['long']) {
+                    foreach ($fileInfo['children'] as &$item) {
+                        /* 统计子目录个数以及获取目录修改时间 */
+                        if ($item['isDirectory']) {
+                            $directoryName = $fileInfo['fullPath'] . '/' . $item['name'];
+                            $itemChildren = $handle->listDirectory($directoryName);
+                            $item['childrenCount'] = count($itemChildren) + 2;
+                            $maxData['children'] = max($maxData['children'], $item['childrenCount']);
+                        } else {
+                            $maxData['size'] = max($maxData['size'], $item['fileSize']);
+                        }
                     }
                 }
+                $fileList['directory'] []= $fileInfo;
+            } else {
+                $fileList['file'] [] = $fileInfo;
             }
-            $fileList['directory'] []= $fileInfo;
         }
         return [
             'maxData' => $maxData,
@@ -85,11 +96,11 @@ class LsCommand extends Command {
         ];
     }
     
-    private function printDirectory($list, $option, OutputInterface $output) {
+    private function printDirectory($list, $options, OutputInterface $output) {
         $maxData = $list['maxData'];
         $fileList = $list['fileList'];
         foreach ($fileList['file'] as $file) {
-            $this->printFile($file, $option, $maxData, $output);
+            $this->printFile($file, $options, $maxData, $output);
         }
         foreach ($fileList['directory'] as $postion => $directory) {
             if (count($fileList['file']) + count($fileList['directory']) !== 1) {
@@ -99,13 +110,14 @@ class LsCommand extends Command {
                 $output->writeln("{$directory['name']}:");
             }
             foreach ($directory['children'] as $file) {
-                $this->printFile($file, $option, $maxData, $output);
+                $this->printFile($file, $options, $maxData, $output);
             }
         }
     }
     
-    private function printFile($file, $option, $maxData, OutputInterface $output) {
-        if ($option['long']) {
+    private function printFile($file, $options, $maxData, OutputInterface $output) {
+        $name = $this->renderFilename($file, $options);
+        if ($options['long']) {
             $d = $file['isDirectory'] ? 'd' : '-';
             $x = $file['isDirectory'] ? 'x' : '-';
             $childrenLength = floor(log10($maxData['children']) + 1);
@@ -115,12 +127,24 @@ class LsCommand extends Command {
             $modifyTime = $file['modifyTime'];
             $time = (date('Y') === date('Y', $modifyTime) ? 
                     date('M d H:i', $modifyTime) : date('M d  Y', $modifyTime));
-            
             $str = sprintf("%srw%srw%srw%s %{$childrenLength}d root root %{$sizeLength}d %s %s", 
-                    $d, $x, $x, $x, $childrenCount, $fileSize, $time, $file['name']);
+                    $d, $x, $x, $x, $childrenCount, $fileSize, $time, $name);
         } else {
-            $str = $file['name'];
+            $str = $name;
         }
         $output->writeln($str);
+    }
+    
+    private function renderFilename($file, $options) {
+        $result = $file['name'];
+        if ($options['color'] === 'always' || $options['color'] === 'auto') {
+            if ($file['isDirectory']) {
+                $result = "<fg=blue>{$file['name']}</>";
+            }
+        }
+        if ($options['classify'] && $file['isDirectory']) {
+            $result .= '/';
+        }
+        return $result;
     }
 }

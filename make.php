@@ -16,7 +16,7 @@ if (file_exists($pharName)) {
 
 $phar = new Phar($pharName);
 $phar->startBuffering();
-$phar->buildFromDirectory(__DIR__);
+$phar->buildFromDirectory(__DIR__, '/^((?!\.git).)*$/');
 $phar->compressFiles(Phar::GZ);
 $stub = "#!/usr/bin/env php\n";
 $stub .= $phar->createDefaultStub('app.php');

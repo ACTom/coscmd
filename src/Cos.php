@@ -34,6 +34,28 @@ class Cos {
         }
     }
     
+    public function listBucket() {
+        $result = $this->listDirectory('/', false, '');
+        return $result;
+    }
+    
+    public function setBucket($bucket) {
+        $bucketList = $this->listBucket();
+        foreach ($bucketList as $aBucket) {
+            if ($bucket === $aBucket['name']) {
+                $this->bucket = $bucket;
+                return true;
+            }
+        }
+        $this->errorNo = -133;
+        $this->errorMsg = 'bucket does not exists.';
+        return false;
+    }
+    
+    public function getBucket() {
+        return $this->bucket;
+    }
+    
     public function createDirectory($directoryPath) {
         $result = $this->api->createFolder($this->bucket, $directoryPath);
         return $this->returnResult($result);
@@ -49,14 +71,29 @@ class Cos {
         return $this->returnResult($result);
     }
     
-    public function listDirectory($directoryPath) {
-        $result = $this->api->listFolder($this->bucket, $directoryPath);
+    public function listDirectory($directoryPath, $showAll = false, $bucket = null) {
+        if ($bucket === null) {
+            $bucket = $this->bucket;
+        }
+        $directoryPath = Utils::normalizerRemotePath($directoryPath);
+        $result = $this->api->listFolder($bucket, $directoryPath);
         if ($result['code'] !== 0) {
             return $this->returnResult($result);
         }
         $list = [];
+        if ($showAll) {
+            $thisDirectory = $this->getFileInfo($directoryPath);
+            $thisDirectory['name'] = '.';
+            $parentDirectory = $this->getFileInfo(Utils::normalizerRemotePath($directoryPath . '/..'));
+            $parentDirectory['name'] = '..';
+            $list []= $thisDirectory;
+            $list []= $parentDirectory;
+        }
         foreach ($result['data']['infos'] as $item) {
             $name = $item['name'];
+            if (!$showAll && $name{0} === '.') {
+                continue;
+            }
             $isDirectory = substr($name, -1 ,1) === '/';
             if ($isDirectory) {
                 $name = substr($name, 0, strlen($name) - 1);
@@ -99,6 +136,7 @@ class Cos {
         }
         $fileInfo = [
             'name' => basename($filePath),
+            'fullPath' => $filePath,
             'isDirectory' => $isDirectory,
             'fileSize' => $isDirectory ? 0 : $data['filesize'],
             'createTime' => $data['ctime'],

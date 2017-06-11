@@ -4,12 +4,30 @@ namespace ACTom\COSCmd;
 
 class Utils {
     
-    public static function normalizerRemotePath($path) {
-        if (preg_match('/^\//', $path) === 0) {
-            $path = '/' . $path;
+    /* 格式化远程目录 
+     * @param $path          string 待格式化目录
+     * @param $baseDirectory string 基础目录
+     * @return               string 格式化后目录
+     */
+    public static function normalizerRemotePath($path, $baseDirectory = null) {
+        if ($baseDirectory !== null) {
+            $path = $baseDirectory . '/' . $path;
         }
-        
+        /* 删除重复的/ */
         $path = preg_replace('#/+#', '/', $path);
+        
+        /* 删除./ ../ */
+        $components=[];
+        foreach(explode('/', $path) as $name) {
+            if ($name === '..') {
+                array_pop($components);
+            } elseif ($name === '.' || $name === '') {
+                continue;
+            } else {
+                $components[]=$name;
+            }
+        }
+        $path = '/' . implode('/', $components);
         return $path;
     }
     
