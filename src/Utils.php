@@ -2,8 +2,9 @@
 
 namespace ACTom\COSCmd;
 
+use Phar;
+
 class Utils {
-    
     /* 格式化远程目录 
      * @param $path          string 待格式化目录
      * @param $baseDirectory string 基础目录
@@ -31,6 +32,19 @@ class Utils {
         return $path;
     }
     
+    public static function localPath($path) {
+        if (!$path) {
+            return $path;
+        }
+        if (Phar::running(false) && !file_exists($path) && $path{0} !== '/') {
+            $path = getcwd() . DIRECTORY_SEPARATOR . $path;
+        }
+        return $path;
+    }
+    
+    /*
+     * 检查程序运行环境
+     */
     public static function checkRequirement() {
         if (php_sapi_name() !== 'cli') {
             exit('This program can only run in CLI mode');
