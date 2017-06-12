@@ -2,14 +2,13 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use ACTom\COSCmd\Utils;
 
 
-class PushCommand extends Command {
+class PushCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -28,7 +27,7 @@ class PushCommand extends Command {
     }
     
     public function doAction($source, $destnation, OutputInterface $output) {
-        global $handle;
+        $handle = $this->getHandle();
         $destnation = $this->normalizerDestnation($source, $destnation);
         if (!$handle->uploadFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
@@ -38,7 +37,7 @@ class PushCommand extends Command {
     }
     
     private function normalizerDestnation($source, $destnation) {
-        global $handle;
+        $handle = $this->getHandle();
         $destnation = Utils::normalizerRemotePath($destnation);
         if ($handle->isDirectory($destnation)) {
             $basename = basename($source);

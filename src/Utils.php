@@ -36,7 +36,7 @@ class Utils {
         if (!$path) {
             return $path;
         }
-        if (Phar::running(false) && !file_exists($path) && $path{0} !== '/') {
+        if (Phar::running(false) && $path{0} !== '/') {
             $path = getcwd() . DIRECTORY_SEPARATOR . $path;
         }
         return $path;

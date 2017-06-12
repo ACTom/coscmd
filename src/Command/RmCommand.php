@@ -2,13 +2,12 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 
-class RmCommand extends Command {
+class RmCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -26,7 +25,7 @@ class RmCommand extends Command {
     }
     
     public function doAction($file, OutputInterface $output) {
-        global $handle;
+        $handle = $this->getHandle();
         if (!$handle->deleteFile($file)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();

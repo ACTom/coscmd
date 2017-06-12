@@ -2,14 +2,13 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use ACTom\COSCmd\Utils;
 
 
-class PullCommand extends Command {
+class PullCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -28,7 +27,7 @@ class PullCommand extends Command {
     }
     
     public function doAction($source, $destnation, OutputInterface $output) {
-        global $handle;
+        $handle = $this->getHandle();
         $destnation = $this->normalizerDestnation($source, $destnation);
         if (!$handle->downloadFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
@@ -38,7 +37,7 @@ class PullCommand extends Command {
     }
     
     private function normalizerDestnation($source, $destnation) {
-        global $handle;
+        $handle = $this->getHandle();
         $source = Utils::normalizerRemotePath($source);
         if (is_dir($destnation)) {
             $basename = basename($source);

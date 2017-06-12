@@ -2,13 +2,12 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 
-class MkdirCommand extends Command {
+class MkdirCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -26,7 +25,7 @@ class MkdirCommand extends Command {
     }
     
     public function doAction($directory, OutputInterface $output) {
-        global $handle;
+        $handle = $this->getHandle();
         if (!$handle->createDirectory($directory)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();

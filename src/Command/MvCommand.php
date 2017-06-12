@@ -2,13 +2,12 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 
-class MvCommand extends Command {
+class MvCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -27,7 +26,7 @@ class MvCommand extends Command {
     }
     
     public function doAction($source, $destnation, OutputInterface $output) {
-        global $handle;
+        $handle = $this->getHandle();
         if (!$handle->moveFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();

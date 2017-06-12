@@ -17,6 +17,5 @@ $commands = ['ls', 'mv', 'rmdir', 'mkdir', 'rm', 'cp', 'push', 'pull'];
 
 /* 设置程序信息 */
 $application = new Application();
-$application->loadConfigure();
 $application->loadCommands($commands);
 $application->run();

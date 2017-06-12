@@ -2,7 +2,6 @@
 
 namespace ACTom\COSCmd\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,7 +10,7 @@ use Symfony\Component\Console\Helper\Table;
 use ACTom\COSCmd\Utils;
 
 
-class LsCommand extends Command {
+class LsCommand extends BaseCommand {
 
     protected function configure() {
         $this
@@ -41,7 +40,7 @@ class LsCommand extends Command {
     }
     
     private function getFileList($files, $options, OutputInterface $output, $baseDirectory = '/') {
-        global $handle;
+        $handle = $this->getHandle();
         $fileList = [
             'file' => [],
             'directory' => []
@@ -106,6 +105,9 @@ class LsCommand extends Command {
             if (count($fileList['file']) + count($fileList['directory']) !== 1) {
                 if (count($fileList['file']) !== 0 || $postion !== 0) {
                     $output->writeln('');
+                }
+                if ($directory['name'] === '') {
+                    $directory['name'] = '/';
                 }
                 $output->writeln("{$directory['name']}:");
             }
