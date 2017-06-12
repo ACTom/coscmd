@@ -50,8 +50,8 @@ class Utils {
             exit('This program can only run in CLI mode');
         }
         
-        if (version_compare(PHP_VERSION, '5.5.9', '<')) {
-            exit('Need PHP Version >= 5.5.9, Your version is ' . PHP_VERSION . "\n");
+        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+            exit('Need PHP Version >= 5.4.0, Your version is ' . PHP_VERSION . "\n");
         }
     }
 }

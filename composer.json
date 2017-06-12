@@ -23,9 +23,9 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.4.0",
         "qcloud/cos": "dev-dev",
-        "symfony/console": "3.2",
+        "symfony/console": "2.8",
         "rkr/wildcards": "^1.0"
     }
 }

@@ -22,7 +22,7 @@ class LsCommand extends Command {
             ->addArgument('file', InputArgument::IS_ARRAY, 
                 'Which file would you like to display?', ['/'])
             ->addOption('long', 'l', InputOption::VALUE_NONE, 'use a long listing format')
-            ->addOption('color', null, InputOption::VALUE_OPTIONAL, "colorize the output; WHEN can be 'never', 'auto', or 'always' (the default); more info below", 'always')
+            ->addOption('color', null, InputOption::VALUE_OPTIONAL, "colorize the output; WHEN can be 'never' or 'auto'(the default); more info below", 'auto')
             ->addOption('classify', 'F', InputOption::VALUE_NONE, 'append indicator (one of */=>@|) to entries')
             ->addOption('directory', 'd', InputOption::VALUE_NONE, 'list directories themselves, not their contents')
             ->addOption('all', 'a', InputOption::VALUE_NONE, 'do not ignore entries starting with .')
@@ -137,7 +137,7 @@ class LsCommand extends Command {
     
     private function renderFilename($file, $options) {
         $result = $file['name'];
-        if ($options['color'] === 'always' || $options['color'] === 'auto') {
+        if ($options['color'] === 'auto') {
             if ($file['isDirectory']) {
                 $result = "<fg=blue>{$file['name']}</>";
             }
