@@ -10,10 +10,25 @@ class Utils {
      * @param $baseDirectory string 基础目录
      * @return               string 格式化后目录
      */
-    public static function normalizerRemotePath($path, $baseDirectory = null) {
-        if ($baseDirectory !== null) {
+    public static function normalizerRemotePath($path, $baseDirectory = '/') {
+        return self::normalizerLinux($path, $baseDirectory);
+    }
+    
+    public function normalizerLocalPath($path, $baseDirectory = null) {
+        return DIRECTORY_SEPARATOR === '/' ? self::normalizerLinux($path, $baseDirectory) : self::normalizerWindows($path, $baseDirectory);
+    }
+    
+    private function normalizerLinux($path, $baseDirectory = null) {
+        if ($baseDirectory === null) {
+            $baseDirectory = getcwd();
+        }
+        if (strlen($path) > 0 && $path{0} !== '/') {
             $path = $baseDirectory . '/' . $path;
         }
+        if (strlen($path) > 0 && $path[0] !== '/') {
+            $path = getcwd() . '/' . $path;
+        }
+        
         /* 删除重复的/ */
         $path = preg_replace('#/+#', '/', $path);
         
@@ -32,14 +47,55 @@ class Utils {
         return $path;
     }
     
-    public static function localPath($path) {
-        if (!$path) {
-            return $path;
+    private function normalizerWindows($path, $baseDirectory = null) {
+        if ($baseDirectory === null) {
+            $baseDirectory = getcwd();
         }
-        if (Phar::running(false) && $path{0} !== '/') {
-            $path = getcwd() . DIRECTORY_SEPARATOR . $path;
+        $pathArr = self::splitPathWindows($path);
+        if (!$pathArr['letter']) {
+            $baseArr = self::splitPathWindows($baseDirectory);
+            $currentArr = self::splitPathWindows(getcwd());
+            $pathArr['letter'] = $baseArr['letter'] ? $baseArr['letter'] : $currentArr['letter'];
+            if (strlen($pathArr['path'])>0 && $pathArr['path']{0} === '\\') {
+                
+            } elseif ($baseArr['letter'] || (strlen($baseArr['path']) > 1 && $baseArr['path']{0} === '\\')) {
+                $pathArr['path'] = $baseArr['path'] . '\\' . $pathArr['path'];
+            } else {
+                $pathArr['path'] = $currentArr['path'] . '\\' . $baseArr['path'] . '\\' . $pathArr['path'];
+            }
         }
+        $path = $pathArr['path'];
+        
+        /* 删除重复的/ */
+        $path = preg_replace('#\\+#', '\\', $path);
+        
+        /* 删除./ ../ */
+        $components=[];
+        foreach(explode('\\', $path) as $name) {
+            if ($name === '..') {
+                array_pop($components);
+            } elseif ($name === '.' || $name === '') {
+                continue;
+            } else {
+                $components[]=$name;
+            }
+        }
+        $path = $pathArr['letter'] . '\\' . implode('\\', $components);
         return $path;
+    }
+    
+    private static function splitPathWindows($path) {
+        if (strlen($path) > 1 && $path{1} === ':') {
+            return [
+                'letter' => substr($path, 0, 2),
+                'path' => substr($path, 2)
+            ];
+        } else {
+            return [
+                'letter' => '',
+                'path' => $path
+            ];
+        }
     }
     
     /*

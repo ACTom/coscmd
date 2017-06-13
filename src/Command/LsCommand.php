@@ -39,7 +39,7 @@ class LsCommand extends BaseCommand {
         $this->printDirectory($list, $options, $output);
     }
     
-    private function getFileList($files, $options, OutputInterface $output, $baseDirectory = '/') {
+    private function getFileList($files, $options, OutputInterface $output, $baseDirectory) {
         $handle = $this->getHandle();
         $fileList = [
             'file' => [],

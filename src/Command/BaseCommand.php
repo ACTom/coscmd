@@ -29,7 +29,7 @@ class BaseCommand extends Command {
             $config = $input->getOption('config');
             /* 配置文件存在 */
             if ($config !== '') {
-                $config = Utils::localPath($config);
+                $config = Utils::normalizerLocalPath($config);
                 if (!file_exists($config)) {
                     $errorOutput->writeln("error: Configure file {$config} does not exists.");
                     exit();
