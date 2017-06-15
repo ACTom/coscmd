@@ -11,7 +11,7 @@ use Phar;
 class Application extends App {
     
     public function __construct() {
-        parent::__construct('CosCmd', 'v0.0.1');
+        parent::__construct('CosCmd', 'v0.5.0');
         $definition = $this->getDefinition();
         $definition->addOption(new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, "Load a configure file", ""));
     }
