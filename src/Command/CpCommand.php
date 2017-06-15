@@ -22,10 +22,10 @@ class CpCommand extends BaseCommand {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $source = $input->getArgument('source');
         $destnation = $input->getArgument('destnation');
-        $this->doAction($source, $destnation, $output);
+        $this->doAction($source, $destnation, $input, $output);
     }
     
-    public function doAction($source, $destnation, OutputInterface $output) {
+    public function doAction($source, $destnation, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
         if (!$handle->copyFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();

@@ -76,20 +76,30 @@ class Cos {
             $bucket = $this->bucket;
         }
         $directoryPath = Utils::normalizerRemotePath($directoryPath);
-        $result = $this->api->listFolder($bucket, $directoryPath);
-        if ($result['code'] !== 0) {
-            return $this->returnResult($result);
+        $context = null;
+        $listover = false;
+        $sourceList = [];
+        while (!$listover) {
+            $result = $this->api->listFolder($bucket, $directoryPath, 20, 'eListBoth', 0, $context);
+            if ($result['code'] !== 0) {
+                return $this->returnResult($result);
+            }
+            $sourceList = array_merge($sourceList, $result['data']['infos']);
+            $context = $result['data']['context'];
+            $listover = $result['data']['listover'];
         }
         $list = [];
         if ($showAll) {
             $thisDirectory = $this->getFileInfo($directoryPath);
             $thisDirectory['name'] = '.';
+            $thisDirectory['isDirectory'] = true;
             $parentDirectory = $this->getFileInfo(Utils::normalizerRemotePath($directoryPath . '/..'));
             $parentDirectory['name'] = '..';
+            $parentDirectory['isDirectory'] = true;
             $list []= $thisDirectory;
             $list []= $parentDirectory;
         }
-        foreach ($result['data']['infos'] as $item) {
+        foreach ($sourceList as $item) {
             $name = $item['name'];
             if (!$showAll && $name{0} === '.') {
                 continue;
@@ -124,12 +134,13 @@ class Cos {
         $result = $this->api->stat($this->bucket, $filePath);
         /* 如果获取文件失败 */
         if ($result['code'] !== 0 || $filePath === '/') {
-            $resultDirectory = $this->api->statFolder($this->bucket, $filePath);
-            if ($resultDirectory['code'] !== 0) {
+            /* Api在删除了存在文件的目录后，通过stat和statFolder查询会返回文件不存在，需要利用listFolder来查询文件是否存在 */
+            $resultDirectory = $this->api->listFolder($this->bucket, $filePath);
+            if (count($resultDirectory['data']['infos']) === 0) {
                 return $this->returnResult($result);
             }
             $isDirectory = 1;
-            $data = $resultDirectory['data'];
+            $data = ['ctime' => 0, 'mtime' => 0];
         } else {
             $isDirectory = 0;
             $data = $result['data'];

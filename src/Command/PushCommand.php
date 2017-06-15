@@ -75,7 +75,7 @@ class PushCommand extends BaseCommand {
                 }
                 $fileInfo = [
                     'source' => $item['source'] . DIRECTORY_SEPARATOR . $file,
-                    'destnation' => $item['destnation'] . '/' . $file
+                    'destnation' => Utils::normalizerRemotePath($item['destnation'] . '/' . $file)
                 ];
                 $fileInfo['isDirectory'] = is_dir($fileInfo['source']);
                 if ($fileInfo['isDirectory']) {

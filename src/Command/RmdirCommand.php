@@ -21,10 +21,10 @@ class RmdirCommand extends BaseCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $directory = $input->getArgument('directory');
-        $this->doAction($directory, $output);
+        $this->doAction($directory, $input, $output);
     }
     
-    public function doAction($directory, OutputInterface $output) {
+    public function doAction($directory, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
         if (!$handle->deleteDirectory($directory)) {
             $errorNo = $handle->getLastErrorNo();

@@ -11,6 +11,8 @@ use ACTom\COSCmd\Utils;
 
 
 class LsCommand extends BaseCommand {
+    
+    private $options = [];
 
     protected function configure() {
         $this
@@ -30,16 +32,17 @@ class LsCommand extends BaseCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $files = $input->getArgument('file');
-        $options = $input->getOptions();
-        $this->doAction($files, $options, $output);
+        $this->doAction($files, $input, $output);
     }
     
-    public function doAction($files, $options, OutputInterface $output, $baseDirectory = '/') {
-        $list = $this->getFileList($files, $options, $output, $baseDirectory);
-        $this->printDirectory($list, $options, $output);
+    public function doAction($files, InputInterface $input, OutputInterface $output, $baseDirectory = '/') {
+        $this->options = $input->getOptions();
+        $list = $this->getFileList($files, $output, $baseDirectory);
+        $this->printDirectory($list, $output);
     }
     
-    private function getFileList($files, $options, OutputInterface $output, $baseDirectory) {
+    private function getFileList($files, OutputInterface $output, $baseDirectory) {
+        $options = $this->options;
         $handle = $this->getHandle();
         $fileList = [
             'file' => [],
@@ -95,11 +98,12 @@ class LsCommand extends BaseCommand {
         ];
     }
     
-    private function printDirectory($list, $options, OutputInterface $output) {
+    private function printDirectory($list, OutputInterface $output) {
+        $options = $this->options;
         $maxData = $list['maxData'];
         $fileList = $list['fileList'];
         foreach ($fileList['file'] as $file) {
-            $this->printFile($file, $options, $maxData, $output);
+            $this->printFile($file, $maxData, $output);
         }
         foreach ($fileList['directory'] as $postion => $directory) {
             if (count($fileList['file']) + count($fileList['directory']) !== 1) {
@@ -112,13 +116,14 @@ class LsCommand extends BaseCommand {
                 $output->writeln("{$directory['name']}:");
             }
             foreach ($directory['children'] as $file) {
-                $this->printFile($file, $options, $maxData, $output);
+                $this->printFile($file, $maxData, $output);
             }
         }
     }
     
-    private function printFile($file, $options, $maxData, OutputInterface $output) {
-        $name = $this->renderFilename($file, $options);
+    private function printFile($file, $maxData, OutputInterface $output) {
+        $options = $this->options;
+        $name = $this->renderFilename($file);
         if ($options['long']) {
             $d = $file['isDirectory'] ? 'd' : '-';
             $x = $file['isDirectory'] ? 'x' : '-';
@@ -137,7 +142,8 @@ class LsCommand extends BaseCommand {
         $output->writeln($str);
     }
     
-    private function renderFilename($file, $options) {
+    private function renderFilename($file) {
+        $options = $this->options;
         $result = $file['name'];
         if ($options['color'] === 'auto') {
             if ($file['isDirectory']) {
