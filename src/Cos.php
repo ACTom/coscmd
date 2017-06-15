@@ -182,6 +182,10 @@ class Cos {
     }
     
     public function deleteDirectory($directoryPath) {
+        $list = $this->listDirectory($directoryPath, true);
+        if (count($list) > 2) {
+            return $this->returnResult(['code' => -198, 'message' => 'ERROR_CMD_DIRECTORY_NOTEMPTY']);
+        }
         $result = $this->api->delFolder($this->bucket, $directoryPath);
         return $this->returnResult($result);
     }

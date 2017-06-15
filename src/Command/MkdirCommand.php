@@ -26,10 +26,11 @@ class MkdirCommand extends BaseCommand {
     
     public function doAction($directory, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
+        $errorOutput = $output->getErrorOutput();
         if (!$handle->createDirectory($directory)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $output->writeln("mkdir: cannot create directory '{$directory}': error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>mkdir: cannot create directory '{$directory}': error code:{$errorNo}, error message: {$errorMsg}</>");
         }
     }
 }

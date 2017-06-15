@@ -38,11 +38,11 @@ class PushCommand extends BaseCommand {
         $errorOutput = $output->getErrorOutput();
         $this->options = $input->getOptions();
         if ($this->options['force'] && $this->options['no-interaction']) {
-            $errorOutput->writeln("push: --force and --no-interaction options cannot used at the same time.");
+            $errorOutput->writeln("<error>push: --force and --no-interaction options cannot used at the same time</>");
             return ;
         }
         if (!file_exists($source)) {
-            $errorOutput->writeln("push: {$source} does not exists.");
+            $errorOutput->writeln("<error>push: {$source} does not exists</>");
             return ;
         }
         if ($handle->isDirectory($destnation)) {
@@ -51,7 +51,7 @@ class PushCommand extends BaseCommand {
         }
         if (is_dir($source)) {
             if ($handle->fileExists($destnation) && !$handle->isDirectory($destnation)) {
-                $errorOutput->writeln("push: cannot overwrite non-directory {$destnation} with directory {$source}.");
+                $errorOutput->writeln("<error>push: cannot overwrite non-directory {$destnation} with directory {$source}</error>");
                 return ;
             }
             $this->uploadDirectory($source, $destnation, $input, $output);

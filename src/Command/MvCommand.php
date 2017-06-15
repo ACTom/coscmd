@@ -47,11 +47,11 @@ class MvCommand extends BaseCommand {
         }
         if ($handle->isDirectory($source)) {
             if (!$this->options['recursive']) {
-                $errorOutput->writeln("mv: cannot copy '{$source}': Is a directory");
+                $errorOutput->writeln("<error>mv: cannot copy '{$source}': Is a directory</>");
                 return ;
             }
             if ($handle->fileExists($destnation) && !$handle->isDirectory($destnation)) {
-                $errorOutput->writeln("mv: cannot overwrite non-directory {$destnation} with directory {$source}.");
+                $errorOutput->writeln("<error>mv: cannot overwrite non-directory {$destnation} with directory {$source}</>");
                 return ;
             }
             $this->moveDirectory($source, $destnation, $input, $output);
@@ -79,7 +79,7 @@ class MvCommand extends BaseCommand {
         if ($handle->createDirectory($destnation)) {
             $source = $delete = [$fileInfo];
         } else {
-            $errorOutput->writeln("mv: Create Directory {$destnation} fail");
+            $errorOutput->writeln("<error>mv: Create Directory {$destnation} fail</>");
         }
         while (($item = array_pop($source))) {
             if ($this->options['verbose']) {
@@ -104,7 +104,7 @@ class MvCommand extends BaseCommand {
                         array_push($source, $fileInfo);
                         array_push($delete, $fileInfo);
                     } else {
-                        $errorOutput->writeln("mv: Create Directory {$fileInfo['destnation']} fail");
+                        $errorOutput->writeln("<error>mv: Create Directory {$fileInfo['destnation']} fail</>");
                     }
                 }
                 if (!$fileInfo['isDirectory']) {
@@ -133,7 +133,7 @@ class MvCommand extends BaseCommand {
             if (!$handle->deleteDirectory($item['source'])) {
                 $errorNo = $handle->getLastErrorNo();
                 $errorMsg = $handle->getLastError();
-                $errorOutput->writeln("mv: delete {$source}: fail, error code:{$errorNo}, error message: {$errorMsg}");
+                $errorOutput->writeln("<error>mv: delete {$source}: fail, error code:{$errorNo}, error message: {$errorMsg}</>");
             }
         }
     }
@@ -144,7 +144,7 @@ class MvCommand extends BaseCommand {
         if (!$handle->moveFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $errorOutput->writeln("mv: move {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>mv: move {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}</>");
         }
     }
 }

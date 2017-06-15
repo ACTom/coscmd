@@ -58,7 +58,7 @@ class LsCommand extends BaseCommand {
             $fileInfo = $handle->getFileInfo($fullPath);
             /* 文件不存在 */
             if ($fileInfo === false) {
-                $errorOutput->writeln("ls: cannot access '{$filePath}': No such file or directory");
+                $errorOutput->writeln("<error>ls: cannot access '{$filePath}': No such file or directory</>");
                 continue;
             }
             

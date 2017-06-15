@@ -39,7 +39,7 @@ class PullCommand extends BaseCommand {
         }
         
         if (!$handle->fileExists($source)) {
-            $errorOutput->writeln("pull: cannot pull {$source}, No such file or directory");
+            $errorOutput->writeln("<error>pull: cannot pull {$source}, No such file or directory</>");
             return ;
         }
         
@@ -69,7 +69,7 @@ class PullCommand extends BaseCommand {
         if (mkdir($destnation)) {
             $source = [$fileInfo];
         } else {
-            $errorOutput->writeln("pull: Create Directory {$destnation} fail");
+            $errorOutput->writeln("<error>pull: Create Directory {$destnation} fail</>");
         }
         while (($item = array_pop($source))) {
             if ($this->options['verbose']) {
@@ -93,7 +93,7 @@ class PullCommand extends BaseCommand {
                         }
                         array_push($source, $fileInfo);
                     } else {
-                        $errorOutput->writeln("pull: Create Directory {$fileInfo['destnation']} fail");
+                        $errorOutput->writeln("<error>pull: Create Directory {$fileInfo['destnation']} fail</>");
                     }
                 }
                 if (!$fileInfo['isDirectory']) {
@@ -118,7 +118,7 @@ class PullCommand extends BaseCommand {
         if (!$handle->downloadFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $errorOutput->writeln("pull: download file {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>pull: download file {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}</>");
         }
     }
 }

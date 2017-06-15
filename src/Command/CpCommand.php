@@ -37,7 +37,7 @@ class CpCommand extends BaseCommand {
         $destnation = Utils::normalizerRemotePath($destnation);
         
         if (!$handle->fileExists($source)) {
-            $errorOutput->writeln("cp: {$source} does not exists.");
+            $errorOutput->writeln("<error>cp: {$source} does not exists.</>");
             return ;
         }
         if ($handle->isDirectory($destnation)) {
@@ -46,11 +46,11 @@ class CpCommand extends BaseCommand {
         }
         if ($handle->isDirectory($source)) {
             if (!$this->options['recursive']) {
-                $errorOutput->writeln("cp: cannot copy '{$source}': Is a directory");
+                $errorOutput->writeln("<error>cp: cannot copy '{$source}': Is a directory</>");
                 return ;
             }
             if ($handle->fileExists($destnation) && !$handle->isDirectory($destnation)) {
-                $errorOutput->writeln("cp: cannot overwrite non-directory {$destnation} with directory {$source}.");
+                $errorOutput->writeln("<error>cp: cannot overwrite non-directory {$destnation} with directory {$source}</>");
                 return ;
             }
             $this->copyDirectory($source, $destnation, $input, $output);
@@ -78,7 +78,7 @@ class CpCommand extends BaseCommand {
         if ($handle->createDirectory($destnation)) {
             $source = [$fileInfo];
         } else {
-            $errorOutput->writeln("cp: Create Directory {$destnation} fail");
+            $errorOutput->writeln("<error>cp: Create Directory {$destnation} fail</>");
         }
         while (($item = array_pop($source))) {
             if ($this->options['verbose']) {
@@ -102,7 +102,7 @@ class CpCommand extends BaseCommand {
                         }
                         array_push($source, $fileInfo);
                     } else {
-                        $errorOutput->writeln("cp: Create Directory {$fileInfo['destnation']} fail");
+                        $errorOutput->writeln("<error>cp: Create Directory {$fileInfo['destnation']} fail</>");
                     }
                 }
                 if (!$fileInfo['isDirectory']) {
@@ -127,7 +127,7 @@ class CpCommand extends BaseCommand {
         if (!$handle->copyFile($source, $destnation)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $errorOutput->writeln("cp: copy {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>cp: copy {$source} to {$destnation}: fail, error code:{$errorNo}, error message: {$errorMsg}</>");
         }
     }
 }

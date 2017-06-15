@@ -34,12 +34,12 @@ class RmCommand extends BaseCommand {
         $errorOutput = $output->getErrorOutput();
         $this->options = $input->getOptions();
         if (!$handle->fileExists($file)) {
-            $errorOutput->writeln("rm: cannot remove '{$file}': No such file or directory");
+            $errorOutput->writeln("<error>rm: cannot remove '{$file}': No such file or directory</>");
             return ;
         }
         if ($handle->isDirectory($file)) {
             if (!$this->options['recursive']) {
-                $errorOutput->writeln("rm: cannot remove '{$file}': Is a directory");
+                $errorOutput->writeln("<error>rm: cannot remove '{$file}': Is a directory</>");
                 return ;
             }
             $this->deleteDirectory($file, $output);
@@ -93,7 +93,7 @@ class RmCommand extends BaseCommand {
                 if (!$handle->deleteDirectory($item['source'])) {
                     $errorNo = $handle->getLastErrorNo();
                     $errorMsg = $handle->getLastError();
-                    $errorOutput->writeln("rm: cannot remove '{$item['source']}': error code:{$errorNo}, error message: {$errorMsg}");
+                    $errorOutput->writeln("<error>rm: cannot remove '{$item['source']}': error code:{$errorNo}, error message: {$errorMsg}</>");
                 }
             } else {
                 if ($this->options['verbose']) {
@@ -110,7 +110,7 @@ class RmCommand extends BaseCommand {
         if (!$handle->deleteFile($file)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $errorOutput->writeln("rm: cannot remove '{$file}': error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>rm: cannot remove '{$file}': error code:{$errorNo}, error message: {$errorMsg}</error>");
         }
     }
 }

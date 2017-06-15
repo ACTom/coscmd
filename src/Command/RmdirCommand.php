@@ -5,6 +5,7 @@ namespace ACTom\COSCmd\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use ACTom\COSCmd\Utils;
 
 
 class RmdirCommand extends BaseCommand {
@@ -26,10 +27,12 @@ class RmdirCommand extends BaseCommand {
     
     public function doAction($directory, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
+        $directory = Utils::normalizerRemotePath($directory);
+        $errorOutput = $output->getErrorOutput();
         if (!$handle->deleteDirectory($directory)) {
             $errorNo = $handle->getLastErrorNo();
             $errorMsg = $handle->getLastError();
-            $output->writeln("rmdir: failed to remove '{$directory}': error code:{$errorNo}, error message: {$errorMsg}");
+            $errorOutput->writeln("<error>rmdir: failed to remove '{$directory}': error code:{$errorNo}, error message: {$errorMsg}</>");
         }
     }
 }
