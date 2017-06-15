@@ -89,11 +89,11 @@ class PullCommand extends BaseCommand {
                 if ($fileInfo['isDirectory'] ) {
                     if (mkdir($fileInfo['destnation'])) {
                         if ($this->options['verbose']) {
-                            $output->writeln("Create Directory {$item['destnation']} success");
+                            $output->writeln("Create Directory {$fileInfo['destnation']} success");
                         }
                         array_push($source, $fileInfo);
                     } else {
-                        $errorOutput->writeln("pull: Create Directory {$item['destnation']} fail");
+                        $errorOutput->writeln("pull: Create Directory {$fileInfo['destnation']} fail");
                     }
                 }
                 if (!$fileInfo['isDirectory']) {

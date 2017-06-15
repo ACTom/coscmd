@@ -54,13 +54,13 @@ class PushCommand extends BaseCommand {
                 $errorOutput->writeln("push: cannot overwrite non-directory {$destnation} with directory {$source}.");
                 return ;
             }
-            $this->uploadDirectory($source, $destnation, $output);
+            $this->uploadDirectory($source, $destnation, $input, $output);
         } else {
-            $this->uploadFile($source, $destnation, $output);
+            $this->uploadFile($source, $destnation, $input, $output);
         }
     }
     
-    private function uploadDirectory($source, $destnation, OutputInterface $output) {
+    private function uploadDirectory($source, $destnation, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
         $target = $source = [[
             'source' => $source,
@@ -98,12 +98,12 @@ class PushCommand extends BaseCommand {
                 if ($this->options['verbose']) {
                     $output->writeln("[{$count}/{$maxCount}] Upload File: {$item['source']} to {$item['destnation']}");
                 }
-                $this->uploadFile($item['source'], $item['destnation'], $output);
+                $this->uploadFile($item['source'], $item['destnation'], $input, $output);
             }
         }
     }
     
-    private function uploadFile($source, $destnation, OutputInterface $output) {
+    private function uploadFile($source, $destnation, InputInterface $input, OutputInterface $output) {
         $handle = $this->getHandle();
         $errorOutput = $output->getErrorOutput();
         if ($handle->fileExists($destnation)) {
