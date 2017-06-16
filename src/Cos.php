@@ -80,7 +80,7 @@ class Cos {
         $listover = false;
         $sourceList = [];
         while (!$listover) {
-            $result = $this->api->listFolder($bucket, $directoryPath, 20, 'eListBoth', 0, $context);
+            $result = $this->api->listFolder($bucket, $directoryPath, 199, 'eListBoth', 0, $context);
             if ($result['code'] !== 0) {
                 return $this->returnResult($result);
             }

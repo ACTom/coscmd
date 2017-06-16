@@ -2,11 +2,11 @@
 <?php
 
 if (PHP_SAPI !== 'cli') {
-    error("Run for command line only.");
+    exit("Run for command line only.\n");
 }
  
 if (Phar::canWrite() === false) {
-    error("Phar can not write, Set \"phar.readonly = Off\" in php.ini.");
+    exit("Phar can not write, Set \"phar.readonly = Off\" in php.ini.\n");
 }
 
 $pharName = dirname(__DIR__) . '/coscmd.phar';
@@ -26,7 +26,7 @@ $phar->stopBuffering();
 $source = __DIR__ . '/config.php';
 $destnation = dirname(__DIR__) . '/config.php';
 if (!file_exists($destnation)) {
-    copy(__DIR__ . '/config.php', dirname(__DIR__));
+    copy($source, $destnation);
 }
 
 chmod($pharName, 0755);
